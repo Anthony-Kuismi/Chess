@@ -9,8 +9,8 @@ public class GameFrame extends JFrame{
         panel = new GamePanel();
         this.add(panel);
         this.setTitle("Chess");
-        this.setResizable(false);
         this.setBackground(Color.black);
+        this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);

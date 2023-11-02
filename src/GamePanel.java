@@ -4,8 +4,8 @@ import java.util.*;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements Runnable{
-    static final int GAME_WIDTH = 1000;
-    static final int GAME_HEIGHT = (int)(GAME_WIDTH * (0.5555));
+    static final int GAME_WIDTH = 640;
+    static final int GAME_HEIGHT = 640;
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH,GAME_HEIGHT);
 
     Thread gameThread;
@@ -18,6 +18,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.addKeyListener(new KeyList());
         this.addMouseListener(new MouseList());
         this.setPreferredSize(SCREEN_SIZE);
+
         board = new Board();
         gameThread = new Thread(this);
         gameThread.start();
@@ -31,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void draw(Graphics g) {
-        board.draw(g);
+        board.draw(g,getHeight()/8);
         Toolkit.getDefaultToolkit().sync();
     }
     public void update(){
