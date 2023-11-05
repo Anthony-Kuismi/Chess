@@ -1,11 +1,12 @@
 import java.awt.*;
+import java.io.IOException;
 import javax.swing.*;
 
 public class GameFrame extends JFrame{
 
     GamePanel panel;
 
-    GameFrame(){
+    GameFrame() throws IOException {
         panel = new GamePanel();
         this.add(panel);
         this.setTitle("Chess");

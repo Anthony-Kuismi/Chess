@@ -1,11 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements Runnable{
-    static final int GAME_WIDTH = 640;
-    static final int GAME_HEIGHT = 640;
+    static final int GAME_WIDTH = 720;
+    static final int GAME_HEIGHT = 720;
     static final Dimension SCREEN_SIZE = new Dimension(GAME_WIDTH,GAME_HEIGHT);
 
     Thread gameThread;
@@ -13,13 +14,13 @@ public class GamePanel extends JPanel implements Runnable{
     Image image;
     Board board;
 
-    GamePanel(){
+    GamePanel() throws IOException {
         this.setFocusable(true);
         this.addKeyListener(new KeyList());
         this.addMouseListener(new MouseList());
         this.setPreferredSize(SCREEN_SIZE);
 
-        board = new Board();
+        board = new Board(GAME_WIDTH/8);
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -32,7 +33,10 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void draw(Graphics g) {
-        board.draw(g,getHeight()/8);
+        int x = MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x;
+        int y = MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y;
+
+        board.draw(g,x,y);
         Toolkit.getDefaultToolkit().sync();
     }
     public void update(){
@@ -63,10 +67,20 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
+    @Override
+    public Point getMousePosition() throws HeadlessException {
+        return super.getMousePosition();
+    }
+
     public class MouseList extends MouseAdapter{
         public void mousePressed(MouseEvent e) {
             int x = MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x;
             int y = MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y;
+
+            //1 is left click, 2 is middle click, 3 is right click
+            if(e.getButton() == 1){
+                board.movePiece(x,y);
+            }
         }
     }
 }

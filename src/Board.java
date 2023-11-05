@@ -1,9 +1,15 @@
+import ChessPiece.*;
+
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Board {
-    private HashMap<PieceType,byte[]> bitBoards = new HashMap<>();
+    private final int tileSize;
+    private HashMap<PieceType,Piece> pieces = new HashMap<>();
+    private PieceType selectedPiece = null;
+    private boolean whiteTurn = true;
 
     enum PieceType{
         WHITE_PAWN, BLACK_PAWN,
@@ -14,152 +20,32 @@ public class Board {
         WHITE_KING, BLACK_KING
     }
 
-    private void resetBoard(){
-        final byte[] DEFAULT_WHITE_PAWNS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B11111111,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_BLACK_PAWNS = {
-                (byte) 0B00000000,
-                (byte) 0B11111111,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_WHITE_KNIGHTS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B01000010
-        };
-        final byte[] DEFAULT_BLACK_KNIGHTS = {
-                (byte) 0B01000010,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_WHITE_BISHOPS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00100100
-        };
-        final byte[] DEFAULT_BLACK_BISHOPS = {
-                (byte) 0B00100100,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_WHITE_ROOKS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B10000001
-        };
-        final byte[] DEFAULT_BLACK_ROOKS = {
-                (byte) 0B10000001,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_WHITE_QUEENS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00010000
-        };
-        final byte[] DEFAULT_BLACK_QUEENS = {
-                (byte) 0B00010000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
-        final byte[] DEFAULT_WHITE_KINGS = {
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00001000
-        };
-        final byte[] DEFAULT_BLACK_KINGS = {
-                (byte) 0B00001000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000,
-                (byte) 0B00000000
-        };
+    public Board(int tileSize) throws IOException {
+        this.tileSize = tileSize;
 
-        bitBoards.put(PieceType.WHITE_PAWN,DEFAULT_WHITE_PAWNS);
-        bitBoards.put(PieceType.BLACK_PAWN,DEFAULT_BLACK_PAWNS);
-        bitBoards.put(PieceType.WHITE_KNIGHT,DEFAULT_WHITE_KNIGHTS);
-        bitBoards.put(PieceType.BLACK_KNIGHT,DEFAULT_BLACK_KNIGHTS);
-        bitBoards.put(PieceType.WHITE_BISHOP,DEFAULT_WHITE_BISHOPS);
-        bitBoards.put(PieceType.BLACK_BISHOP,DEFAULT_BLACK_BISHOPS);
-        bitBoards.put(PieceType.WHITE_ROOK,DEFAULT_WHITE_ROOKS);
-        bitBoards.put(PieceType.BLACK_ROOK,DEFAULT_BLACK_ROOKS);
-        bitBoards.put(PieceType.WHITE_QUEEN,DEFAULT_WHITE_QUEENS);
-        bitBoards.put(PieceType.BLACK_QUEEN,DEFAULT_BLACK_QUEENS);
-        bitBoards.put(PieceType.WHITE_KING,DEFAULT_WHITE_KINGS);
-        bitBoards.put(PieceType.BLACK_KING,DEFAULT_BLACK_KINGS);
+        pieces.put(PieceType.WHITE_PAWN,new WhitePawn(tileSize));
+        pieces.put(PieceType.BLACK_PAWN,new BlackPawn(tileSize));
+        pieces.put(PieceType.WHITE_KNIGHT,new WhiteKnight(tileSize));
+        pieces.put(PieceType.BLACK_KNIGHT,new BlackKnight(tileSize));
+        pieces.put(PieceType.WHITE_BISHOP,new WhiteBishop(tileSize));
+        pieces.put(PieceType.BLACK_BISHOP,new BlackBishop(tileSize));
+        pieces.put(PieceType.WHITE_ROOK,new WhiteRook(tileSize));
+        pieces.put(PieceType.BLACK_ROOK,new BlackRook(tileSize));
+        pieces.put(PieceType.WHITE_QUEEN,new WhiteQueen(tileSize));
+        pieces.put(PieceType.BLACK_QUEEN,new BlackQueen(tileSize));
+        pieces.put(PieceType.WHITE_KING,new WhiteKing(tileSize));
+        pieces.put(PieceType.BLACK_KING,new BlackKing(tileSize));
     }
 
-    public Board(){
-        resetBoard();
+    public void draw(Graphics graphics, int x, int y){
+        drawBoard(graphics);
+        drawPieces(graphics);
+        if(selectedPiece !=null){
+            graphics.drawImage(pieces.get(selectedPiece).getImage(),x-tileSize/2,y-tileSize/2,null);
+        }
     }
 
-    public void draw(Graphics graphics, int tileSize){
-        drawBoard(graphics,tileSize);
-        drawBitBoards(tileSize, graphics);
-    }
-
-    public void drawBoard(Graphics graphics, int tileSize){
+    public void drawBoard(Graphics graphics){
         for(int row = 0; row < 8; row++){
             for(int column = 0; column < 8; column++){
                 if ((row + column) % 2 == 0) {
@@ -172,77 +58,62 @@ public class Board {
         }
     }
 
-    private void drawBitBoards(int tileSize, Graphics graphics){
-        for(Map.Entry<PieceType,byte[]> entry: bitBoards.entrySet()){
-            drawBitBoard(entry.getKey(),tileSize,graphics);
+    private void drawPieces(Graphics graphics){
+        for(Map.Entry<PieceType,Piece> entry: pieces.entrySet()){
+            entry.getValue().draw(graphics);
         }
     }
 
-    private void drawBitBoard(PieceType type, int tileSize, Graphics graphics){
-        for(int row = 0; row < 8; row++){
-            int rowBits = bitBoards.get(type)[row];
-            for(int column = 7; column >= 0; column--){
-                if((rowBits & 1) ==1){
-                    drawPiece(row,column,type,tileSize,graphics);
-                }
-                rowBits = rowBits >> 1;
+    private PieceType getPieceAt(int row, int column){
+        for(Map.Entry<PieceType,Piece> entry: pieces.entrySet()){
+            if(entry.getValue().onSquare(row,column)){
+                return entry.getKey();
             }
         }
+        return null;
     }
 
-    private void drawPiece(int row, int column, PieceType type, int tileSize, Graphics graphics){
-        switch (type){
-            case WHITE_PAWN:
-                graphics.setColor(Color.WHITE);
-                graphics.fillOval(column*tileSize,row*tileSize,tileSize,tileSize);
-                break;
-            case BLACK_PAWN:
-                graphics.setColor(Color.BLACK);
-                graphics.fillOval(column*tileSize,row*tileSize,tileSize,tileSize);
-                break;
-            case WHITE_KNIGHT:
-                graphics.setColor(Color.WHITE);
-                graphics.fillOval(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case BLACK_KNIGHT:
-                graphics.setColor(Color.BLACK);
-                graphics.fillOval(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case WHITE_BISHOP:
-                graphics.setColor(Color.WHITE);
-                graphics.drawOval(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case BLACK_BISHOP:
-                graphics.setColor(Color.BLACK);
-                graphics.drawOval(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case WHITE_ROOK:
-                graphics.setColor(Color.WHITE);
-                graphics.fillRect(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case BLACK_ROOK:
-                graphics.setColor(Color.BLACK);
-                graphics.fillRect(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case WHITE_QUEEN:
-                graphics.setColor(Color.WHITE);
-                graphics.drawRect(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case BLACK_QUEEN:
-                graphics.setColor(Color.BLACK);
-                graphics.drawRect(column*tileSize,row*tileSize,tileSize/2,tileSize);
-                break;
-            case WHITE_KING:
-                graphics.setColor(Color.WHITE);
-                graphics.fillRect(column*tileSize,row*tileSize,tileSize,tileSize);
-                break;
-            case BLACK_KING:
-                graphics.setColor(Color.BLACK);
-                graphics.fillRect(column*tileSize,row*tileSize,tileSize,tileSize);
-                break;
-            default:
-                break;
+    private void selectPiece(int row, int column){
+        selectedPiece = getPieceAt(row,column);
+        if(whiteTurn){
+            if(selectedPiece == PieceType.BLACK_PAWN|| selectedPiece == PieceType.BLACK_KNIGHT||
+                    selectedPiece == PieceType.BLACK_BISHOP||selectedPiece == PieceType.BLACK_ROOK||
+                    selectedPiece == PieceType.BLACK_QUEEN||selectedPiece == PieceType.BLACK_KING
+            ){
+                selectedPiece = null;
+                return;
+            }
+        }else{
+            if(!(selectedPiece == PieceType.BLACK_PAWN|| selectedPiece == PieceType.BLACK_KNIGHT||
+                    selectedPiece == PieceType.BLACK_BISHOP||selectedPiece == PieceType.BLACK_ROOK||
+                    selectedPiece == PieceType.BLACK_QUEEN||selectedPiece == PieceType.BLACK_KING)
+            ){
+                selectedPiece = null;
+                return;
+            }
+        }
+        if(selectedPiece != null){
+            pieces.get(selectedPiece).pickUp(row, column);
         }
     }
 
+    private void placePiece(int row, int column){
+        PieceType capture = getPieceAt(row, column);
+        if(capture!=null){
+            pieces.get(capture).pickUp(row, column);
+        }
+        pieces.get(selectedPiece).place(row,column);
+    }
+
+    public void movePiece(int x, int y){
+        int column = x/tileSize;
+        int row = y/tileSize;
+        if(selectedPiece == null){
+            selectPiece(row,column);
+        }else{
+            placePiece(row,column);
+            selectedPiece = null;
+            whiteTurn = !whiteTurn;
+        }
+    }
 }
