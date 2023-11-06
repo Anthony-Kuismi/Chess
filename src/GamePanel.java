@@ -1,7 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
-import java.util.*;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements Runnable{
@@ -14,13 +12,13 @@ public class GamePanel extends JPanel implements Runnable{
     Image image;
     Board board;
 
-    GamePanel() throws IOException {
+    GamePanel(){
         this.setFocusable(true);
         this.addKeyListener(new KeyList());
         this.addMouseListener(new MouseList());
         this.setPreferredSize(SCREEN_SIZE);
 
-        board = new Board(GAME_WIDTH/8);
+        board = new Board(64);
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -65,11 +63,6 @@ public class GamePanel extends JPanel implements Runnable{
         public void keyPressed(KeyEvent e) {
 
         }
-    }
-
-    @Override
-    public Point getMousePosition() throws HeadlessException {
-        return super.getMousePosition();
     }
 
     public class MouseList extends MouseAdapter{
